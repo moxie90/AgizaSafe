@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgizaSafe - Express Import & Logistics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+            --bg-gradient: linear-gradient(135deg, #0b1329 0%, #1e293b 50%, #0f172a 100%);
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --font-calligraphy: 'Great Vibes', cursive;
+            --font-brand: 'Cinzel Decorative', serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 390px;
+            height: 844px;
+            background: var(--card-bg);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 12px #0f172a;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 9999;
+            pointer-events: auto;
+            flex-shrink: 0;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            z-index: 10000;
+        }
+
+        header button {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 10001;
+            pointer-events: auto !important;
+            user-select: none;
+        }
+
+        header button:hover { background: var(--primary); border-color: var(--primary); }
+        header button:active { transform: scale(0.92); }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+            padding: 16px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+
+        .brand-subtitle-script {
+            font-family: var(--font-calligraphy);
+            font-size: 1.6rem;
+            color: #fef08a;
+            line-height: 1;
+            margin-bottom: -2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .brand-main-title {
+            font-family: var(--font-brand);
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        .brand-tagline {
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            margin-top: 2px;
+            font-weight: 700;
+        }
+
+        .toast-container {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            z-index: 2000;
+            pointer-events: none;
+        }
+
+        .toast-popup {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.82rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border: 1px solid var(--accent);
+            border-left: 5px solid var(--accent);
+            pointer-events: auto;
+        }
+
+        .toast-popup.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .main-scroll-area {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        .view {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        h2 { font-size: 1.25rem; color: var(--text-main); margin-bottom: 2px; font-weight: 700; }
+        p.subtitle { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 16px; }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.88rem;
+            outline: none;
+            background: #f8fafc;
+            transition: border 0.2s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input { padding-right: 40px; }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 10px;
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            user-select: none;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.78rem;
+            margin-top: 6px;
+            display: none;
+            font-weight: 600;
+            background: #fee2e2;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #fca5a5;
+        }
+
+        .phone-input-group { display: flex; gap: 8px; }
+        .phone-input-group select { width: 40%; }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 14px 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .checkbox-group input { width: auto; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            margin-top: 6px;
+            box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3);
+            transition: background 0.2s ease;
+        }
+
+        .btn-accent { background: var(--accent); box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3); }
+        .btn-accent:hover { background: var(--accent-hover); }
+        .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); box-shadow: none; }
+
+        .ad-slider {
+            position: relative;
+            width: 100%;
+            height: 95px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .ad-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            color: white;
+        }
+
+        .ad-slide.active { opacity: 1; }
+        .ad-slide-1 { background: linear-gradient(45deg, #1e3a8a, #3b82f6); }
+        .ad-slide-2 { background: linear-gradient(45deg, #b45309, #f59e0b); }
+        .ad-slide-3 { background: linear-gradient(45deg, #047857, #10b981); }
+
+        .ad-text h4 { font-size: 0.95rem; font-weight: 700; }
+        .ad-text p { font-size: 0.75rem; opacity: 0.9; margin-top: 2px; }
+        .ad-tag { background: rgba(255,255,255,0.25); padding: 4px 8px; border-radius: 14px; font-size: 0.68rem; font-weight: bold; }
+
+        .search-container { position: relative; margin-bottom: 14px; }
+        .search-container input { padding-left: 36px; }
+        .search-icon { position: absolute; left: 12px; top: 11px; color: var(--text-muted); font-size: 0.9rem; }
+
+        .product-grid { display: flex; flex-direction: column; gap: 14px; }
+
+        .product-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+            cursor: pointer;
+        }
+
+        .product-img { width: 100%; height: 130px; object-fit: cover; }
+        .product-info { padding: 10px; display: flex; flex-direction: column; flex: 1; }
+        .product-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 2px; }
+        .product-price { font-size: 0.8rem; color: var(--primary-dark); font-weight: 700; margin-bottom: 4px; }
+
+        .stock-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        .in-stock { background: #d1fae5; color: var(--success); }
+
+        .action-btn-group { display: flex; gap: 6px; margin-top: 6px; }
+        .action-btn-group button { flex: 1; padding: 8px 4px; font-size: 0.75rem; margin-top: 0; }
+
+        .payment-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
+
+        .payment-tab {
+            border: 1.5px solid var(--border);
+            padding: 8px 4px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: #f8fafc;
+        }
+
+        .payment-tab.selected { border-color: var(--primary); background: #f0f9ff; color: var(--primary-dark); }
+        .payment-form-box { background: #f1f5f9; padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px; }
+
+        .cart-modal {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 10500;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .cart-modal.active { display: flex; }
+
+        .cart-content {
+            background: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 16px;
+            width: 100%;
+            max-height: 75%;
+            overflow-y: auto;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+        }
+
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .cart-item-info { font-size: 0.82rem; font-weight: 600; }
+        .cart-item-price { font-size: 0.78rem; color: var(--primary-dark); }
+
+        .chain-stepper { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; padding-left: 20px; position: relative; }
+        .chain-stepper::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+        .chain-step { position: relative; font-size: 0.82rem; color: var(--text-muted); }
+        .chain-step.completed { color: var(--success); font-weight: 600; }
+        .chain-step.active { color: var(--primary-dark); font-weight: bold; }
+        .chain-step::before { content: ''; position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--border); }
+        .chain-step.completed::before { background: var(--success); }
+        .chain-step.active::before { background: var(--accent); }
+
+        .step-location { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; font-style: italic; }
+
+        .rating-stars { display: flex; gap: 6px; font-size: 1.5rem; color: #cbd5e1; cursor: pointer; margin: 8px 0; }
+        .rating-stars .star.selected { color: var(--accent); }
+
+        .receipt-box { background: #fff; border: 2px dashed #cbd5e1; padding: 14px; border-radius: 12px; margin: 12px 0; }
+        .receipt-header { text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px; }
+        .receipt-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
+
+        .thankyou-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border-radius: 20px;
+            padding: 20px 16px;
+            text-align: center;
+            border: 1px solid #bae6fd;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15);
+            margin: 10px 0;
+        }
+
+        .thankyou-icon { font-size: 3rem; margin-bottom: 8px; animation: bounce 1.5s infinite; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+    
+        .pre-buy-payment-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .pre-buy-payment-box h3 { font-size: .9rem; color: var(--primary-dark); margin-bottom: 4px; }
+        .pre-buy-note { font-size: .72rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px; }
+
+        .catalog-payment-result {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 9px 10px;
+            font-size: .72rem;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+
+        .catalog-payment-result.ready { color: var(--primary-dark); border-color: #93c5fd; font-weight: 600; }
+        .payment-method-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+        .payment-method-pill { background: #dbeafe; color: #1e40af; border-radius: 12px; padding: 4px 7px; font-size: .65rem; font-weight: 700; }
+
+        .checkout-summary-card {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .checkout-total-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
+        .checkout-total-price { font-size: 1.1rem; font-weight: 800; color: var(--primary-dark); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="header-left">
+            <button id="back-btn" style="display:none;" type="button" aria-label="Back">⬅️</button>
+            <button id="home-btn" style="display:none;" type="button" aria-label="Home">🏠</button>
+        </div>
+        <div class="header-right">
+            <button id="cart-btn" style="display:none;" type="button" aria-label="Cart">🛒 (<span id="cart-badge">0</span>)</button>
+            <button id="logout-btn" style="display:none;" type="button" aria-label="Logout">Logout</button>
+        </div>
+    </header>
+
+    <div class="hero-banner">
+        <div class="brand-subtitle-script">Fast, Secure & Fearless Logistics</div>
+        <div class="brand-main-title">AGIZASAFE</div>
+        <div class="brand-tagline">Unstoppable Express Cargo</div>
+    </div>
+
+    <div class="toast-container">
+        <div id="toast-popup" class="toast-popup">
+            <span id="toast-icon">⚡</span>
+            <span id="toast-message">Welcome to AgizaSafe!</span>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h2 style="font-size:1.1rem;">Shopping Cart</h2>
+                <button id="cart-close-btn" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">❌</button>
+            </div>
+            <div id="cart-items-list">
+                <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:16px 0;">Your cart is empty.</p>
+            </div>
+            <div style="margin-top:14px; border-top:1px solid var(--border); padding-top:10px;">
+                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.9rem; margin-bottom:10px;">
+                    <span>Total Amount:</span>
+                    <span id="cart-total-val">$0.00</span>
+                </div>
+                <button class="btn btn-accent" id="cart-checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-scroll-area" id="main-scroll-box">
+        
+        <!-- 1. SIGN IN VIEW (NOW FIRST SCREEN) -->
+        <div id="login-view" class="view active">
+            <h2>Sign In</h2>
+            <p class="subtitle">Enter your details to open your account</p>
+
+            <div class="form-group">
+                <label>Phone Number or Email</label>
+                <input type="text" id="login-id" value="+255 712345678">
+            </div>
+
+            <div class="form-group">
+                <label>Secret Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="login-pass" placeholder="Type password here">
+                    <button type="button" class="toggle-password-btn" id="login-pass-peek">👁️</button>
+                </div>
+                <div id="login-error" class="error-message">⚠️ Wrong password! Please check your typing or press the eye icon to see what you wrote.</div>
+            </div>
+
+            <button class="btn" id="login-submit-btn">Sign In</button>
+            <button class="btn btn-outline" style="margin-top:6px;" id="login-reg-btn">Create New Account</button>
+        </div>
+
+        <!-- 2. CREATE PROFILE VIEW (NOW SECOND SCREEN) -->
+        <div id="register-view" class="view">
+            <h2>Create Profile</h2>
+            <p class="subtitle">Register to begin importing & sourcing products safely</p>
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="reg-name" placeholder="Aline Abdon Rwegasira">
+            </div>
+
+            <div class="form-group">
+                <label>Country</label>
+                <select id="reg-country">
+                    <option value="TZ">Tanzania</option>
+                    <option value="KE">Kenya</option>
+                    <option value="UG">Uganda</option>
+                    <option value="CN">China</option>
+                    <option value="US">United States</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <div class="phone-input-group">
+                    <select id="phone-code"><option>+255 (TZ)</option><option>+254 (KE)</option><option>+256 (UG)</option><option>+86 (CN)</option><option>+1 (US)</option></select>
+                    <input type="text" id="reg-phone" placeholder="712345678">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" placeholder="aline@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Business Name</label>
+                <input type="text" placeholder="Aline Supplies">
+            </div>
+
+            <div class="form-group">
+                <label>Where do we deliver?</label>
+                <input type="text" placeholder="Kijitonyama, Dar es Salaam">
+            </div>
+
+            <div class="form-group">
+                <label>Create Secret Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="reg-pass" value="password123">
+                    <button type="button" class="toggle-password-btn" id="reg-pass-peek">👁️</button>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms-check">
+                <label for="terms-check" style="text-transform:none; font-weight:normal; margin:0;">I agree to <a href="#" id="terms-link">Rules of Using AgizaSafe</a></label>
+            </div>
+
+            <button class="btn btn-accent" id="reg-submit-btn">Register Account</button>
+            <button class="btn btn-outline" style="margin-top:6px;" id="reg-login-btn">Already registered? Sign In</button>
+        </div>
+
+        <!-- 3. 2FA OTP VIEW -->
+        <div id="otp-view" class="view">
+            <h2>Security Code</h2>
+            <p class="subtitle">Enter the 6-digit code sent to your phone</p>
+
+            <div class="form-group">
+                <label>Code from SMS</label>
+                <input type="text" id="otp-code" placeholder="778899" style="text-align:center; font-size:1.3rem; letter-spacing:6px;">
+            </div>
+
+            <button class="btn btn-accent" id="otp-verify-btn">Verify Code & Open Dashboard</button>
+        </div>
+
+        <!-- 4. DASHBOARD VIEW -->
+        <div id="dash-view" class="view">
+            <h2>Welcome, <span id="user-display">Aline</span>!</h2>
+            <p class="subtitle">What would you like to do today?</p>
+
+            <div class="ad-slider">
+                <div class="ad-slide ad-slide-1 active">
+                    <div class="ad-text">
+                        <h4>Air Express Freight ✈️</h4>
+                        <p>3 to 5 Days Delivery from China!</p>
+                    </div>
+                    <span class="ad-tag">20% OFF</span>
+                </div>
+                <div class="ad-slide ad-slide-2">
+                    <div class="ad-text">
+                        <h4>Zero Import Hassle 📦</h4>
+                        <p>Customs Clearance Included</p>
+                    </div>
+                    <span class="ad-tag">SAFE</span>
+                </div>
+                <div class="ad-slide ad-slide-3">
+                    <div class="ad-text">
+                        <h4>Direct Factory Wholesale 🏭</h4>
+                        <p>Connect with Guangzhou Suppliers</p>
+                    </div>
+                    <span class="ad-tag">BEST PRICE</span>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
+                <div style="background:#f0f9ff; padding:14px; border-radius:12px; border:1px solid #bae6fd; cursor:pointer;" id="dash-nav-catalog">
+                    <div style="font-size:1.5rem;">🛍️</div>
+                    <div style="font-weight:bold; font-size:0.82rem; margin-top:4px;">View Products</div>
+                </div>
+                <div style="background:#fef3c7; padding:14px; border-radius:12px; border:1px solid #fde68a; cursor:pointer;" id="dash-nav-track">
+                    <div style="font-size:1.5rem;">🚚</div>
+                    <div style="font-weight:bold; font-size:0.82rem; margin-top:4px;">Where is Order?</div>
+                </div>
+                <div style="background:#f3e8ff; padding:14px; border-radius:12px; border:1px solid #e9d5ff; cursor:pointer;" id="dash-nav-refund">
+                    <div style="font-size:1.5rem;">💸</div>
+                    <div style="font-weight:bold; font-size:0.82rem; margin-top:4px;">Ask for Refund</div>
+                </div>
+                <div style="background:#ecfdf5; padding:14px; border-radius:12px; border:1px solid #a7f3d0; cursor:pointer;" id="dash-nav-review">
+                    <div style="font-size:1.5rem;">⭐</div>
+                    <div style="font-weight:bold; font-size:0.82rem; margin-top:4px;">Rate Product</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. CATALOG VIEW -->
+        <div id="catalog-view" class="view">
+            <h2>Available Products</h2>
+            <p class="subtitle">Tap product details or use action buttons</p>
+
+            <div class="pre-buy-payment-box">
+                <h3>Payment Options Before Buying</h3>
+                <p class="pre-buy-note">Select your destination country to see available payment methods and calculate localized currency pricing.</p>
+
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label for="catalog-country">Destination Country</label>
+                    <select id="catalog-country">
+                        <option value="">-- Select Country --</option>
+                        <option value="TZ">Tanzania</option>
+                        <option value="KE">Kenya</option>
+                        <option value="UG">Uganda</option>
+                        <option value="CN">China</option>
+                        <option value="US">United States</option>
+                    </select>
+                </div>
+
+                <div id="catalog-payment-result" class="catalog-payment-result">
+                    <span>💳</span>
+                    <span>Select your country to view available payment methods.</span>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="catalog-search" placeholder="Search product, brand, feature or category...">
+            </div>
+
+            <div class="product-grid" id="product-grid">
+                <div class="product-card" id="prod-card-earbuds" data-title="TWS Wireless Earbuds Bluetooth" data-search="TWS Wireless Earbuds Bluetooth Lenovo TWS Earbuds Pro Black White Blue Compact Noise cancellation 20h battery electronics audio accessories">
+                    <img src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300" class="product-img">
+                    <div class="product-info">
+                        <div class="product-title">TWS Earbuds Pro</div>
+                        <div class="product-price" data-usd="12.50">$12.50 / unit</div>
+                        <div><span class="stock-tag in-stock">Available (45 left)</span></div>
+                        <div class="action-btn-group">
+                            <button class="btn btn-outline" id="btn-add-earbuds">Add to Cart 🛒</button>
+                            <button class="btn btn-accent" id="btn-buy-earbuds">Buy Now ⚡</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" id="prod-card-watch" data-title="Fitness Smartwatch Series 8" data-search="Fitness Smartwatch Series 8 Kospet Smartwatch Series 8 Black Silver 44mm Screen Heart rate tracker IP68 Waterproof wearable electronics fitness">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300" class="product-img">
+                    <div class="product-info">
+                        <div class="product-title">Smartwatch Series 8</div>
+                        <div class="product-price" data-usd="24.00">$24.00 / unit</div>
+                        <div><span class="stock-tag in-stock">Available (12 left)</span></div>
+                        <div class="action-btn-group">
+                            <button class="btn btn-outline" id="btn-add-watch">Add to Cart 🛒</button>
+                            <button class="btn btn-accent" id="btn-buy-watch">Buy Now ⚡</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. PRODUCT DETAIL SPECIFICATION VIEW -->
+        <div id="product-detail-view" class="view">
+            <h2 id="pd-title">Product Details</h2>
+            <p class="subtitle">Complete technical & brand specifications</p>
+
+            <img id="pd-img" src="" style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
+
+            <div style="background:#f8fafc; padding:12px; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; font-size:0.85rem;">
+                <p><strong>Brand:</strong> <span id="pd-brand">-</span></p>
+                <p style="margin-top:4px;"><strong>Price:</strong> <span id="pd-price" style="color:var(--primary-dark); font-weight:bold;">-</span></p>
+                <p style="margin-top:4px;"><strong>Colors:</strong> <span id="pd-color">-</span></p>
+                <p style="margin-top:4px;"><strong>Dimension:</strong> <span id="pd-size">-</span></p>
+                <p style="margin-top:4px;"><strong>Features:</strong> <span id="pd-features">-</span></p>
+            </div>
+
+            <div class="form-group">
+                <label>Select Quantity</label>
+                <input type="number" id="pd-qty" value="1" min="1" max="50">
+            </div>
+
+            <div class="action-btn-group">
+                <button class="btn btn-outline" id="pd-add-btn">Add to Cart 🛒</button>
+                <button class="btn btn-accent" id="pd-buy-btn">Buy Now ⚡</button>
+            </div>
+        </div>
+
+        <!-- 7. PAYMENT METHODS VIEW -->
+        <div id="payment-view" class="view">
+            <h2>Pay for Order</h2>
+            <p class="subtitle">Select payment method to complete purchase</p>
+
+            <div class="checkout-summary-card">
+                <div>
+                    <div class="checkout-total-label">Total Payable</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);" id="pay-country-label">Destination Country Selected</div>
+                </div>
+                <div class="checkout-total-price" id="checkout-total-display">$0.00</div>
+            </div>
+
+            <label>Payment Channel</label>
+            <div class="payment-tabs">
+                <div class="payment-tab selected" id="tab-mobile">📱 Mobile</div>
+                <div class="payment-tab" id="tab-card">💳 Card</div>
+                <div class="payment-tab" id="tab-paypal">🅿️ PayPal</div>
+                <div class="payment-tab" id="tab-bank">🏦 Bank</div>
+            </div>
+
+            <div id="payment-form-container" class="payment-form-box">
+                <div id="form-mobile">
+                    <div class="form-group">
+                        <label>Mobile Provider</label>
+                        <select id="pay-mobile-provider"><option>M-Pesa (Vodacom)</option><option>Yas / Tigo Pesa</option><option>Airtel Money</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Payer Mobile Number</label>
+                        <input type="text" id="pay-mobile-num" placeholder="0712 345 678">
+                    </div>
+                    <div class="form-group">
+                        <label>Account Holder Name</label>
+                        <input type="text" id="pay-mobile-name" placeholder="Aline Abdon Rwegasira">
+                    </div>
+                </div>
+
+                <div id="form-card" style="display:none;">
+                    <div class="form-group">
+                        <label>Cardholder Name</label>
+                        <input type="text" id="pay-card-name" placeholder="Aline Abdon Rwegasira">
+                    </div>
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <input type="text" id="pay-card-num" placeholder="4532 •••• •••• 8921">
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Expiry Date</label>
+                            <input type="text" id="pay-card-exp" placeholder="MM/YY">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>CVV</label>
+                            <input type="password" id="pay-card-cvv" maxlength="4" placeholder="123">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="form-paypal" style="display:none;">
+                    <div class="form-group">
+                        <label>PayPal Email Address</label>
+                        <input type="email" id="pay-paypal-email" placeholder="aline@example.com">
+                    </div>
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Authentication token will be generated on submit.</p>
+                </div>
+
+                <div id="form-bank" style="display:none;">
+                    <div style="background:#fff; padding:8px; border-radius:6px; margin-bottom:10px; font-size:0.78rem; border:1px solid var(--border);">
+                        <p><strong>Bank:</strong> CRDB Bank PLC</p>
+                        <p><strong>Account Name:</strong> AgizaSafe Logistics Ltd</p>
+                        <p><strong>Account No:</strong> 0152984712000</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Deposit / Transfer Ref No.</label>
+                        <input type="text" id="pay-bank-ref" placeholder="REF-891247012">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-accent" id="pay-submit-btn">Confirm & Submit Payment</button>
+        </div>
+
+        <!-- 8. RECEIPT VIEW -->
+        <div id="confirmation-view" class="view">
+            <div style="text-align:center; margin-bottom:12px;">
+                <div style="font-size:3rem; line-height:1;">✅</div>
+                <h2>Payment Received!</h2>
+                <p class="subtitle" style="margin-bottom:6px;">Your transaction was successful</p>
+            </div>
+
+            <div class="receipt-box">
+                <div class="receipt-header">
+                    <strong style="font-family:var(--font-brand); font-size:1rem; color:var(--primary-dark);">AGIZASAFE LOGISTICS</strong>
+                    <p style="font-size:0.75rem; color:var(--text-muted);">Official Payment Receipt</p>
+                </div>
+                
+                <div class="receipt-row">
+                    <span style="color:var(--text-muted);">Receipt No:</span>
+                    <strong id="rec-id">#AG-89124</strong>
+                </div>
+                <div class="receipt-row">
+                    <span style="color:var(--text-muted);">Paid By:</span>
+                    <strong id="rec-payer">Aline Rwegasira</strong>
+                </div>
+                <div class="receipt-row">
+                    <span style="color:var(--text-muted);">Channel:</span>
+                    <strong id="rec-channel">Mobile Money</strong>
+                </div>
+                <div class="receipt-row">
+                    <span style="color:var(--text-muted);">Date & Time:</span>
+                    <strong id="rec-date">Today</strong>
+                </div>
+                <hr style="border:none; border-top:1px dashed #e2e8f0; margin:8px 0;">
+                <div class="receipt-row" style="font-size:0.95rem; margin-top:6px;">
+                    <strong>Amount Received:</strong>
+                    <strong id="rec-amount" style="color:var(--success); font-size:1.1rem;">$0.00</strong>
+                </div>
+            </div>
+
+            <button class="btn btn-accent" id="rec-track-btn">Track Delivery Progress 🚚</button>
+            <button class="btn btn-outline" style="margin-top:6px;" id="rec-dash-btn">Back to Dashboard</button>
+        </div>
+
+        <!-- 9. ORDER TRACKER VIEW -->
+        <div id="track-view" class="view">
+            <h2>Order Tracker</h2>
+            <p class="subtitle">Order #AG001 • Person-to-Person Steps</p>
+
+            <div class="chain-stepper">
+                <div class="chain-step completed">
+                    <strong>1. Order Placed & Payment Safe</strong>
+                    <div class="step-location">Customer ➔ AgizaSafe Accounts</div>
+                </div>
+                <div class="chain-step completed">
+                    <strong>2. Item Found & Checked</strong>
+                    <div class="step-location">AgizaSafe Officer ➔ Guangzhou Supplier</div>
+                </div>
+                <div class="chain-step completed">
+                    <strong>3. Packing in Box</strong>
+                    <div class="step-location">Warehouse Manager</div>
+                </div>
+                <div class="chain-step completed">
+                    <strong>4. Travelling on Ship/Plane</strong>
+                    <div class="step-location">Cargo Ship ➔ Local Port</div>
+                </div>
+                <div class="chain-step active" id="final-delivery-step">
+                    <strong>5. Driver Bringing Item to You</strong>
+                    <div class="step-location">Delivery Driver ➔ Customer</div>
+                </div>
+            </div>
+
+            <button class="btn btn-accent" style="margin-top:20px;" id="track-confirm-btn">I Have Received My Item 📦</button>
+        </div>
+
+        <!-- 10. THANK YOU NOTIFICATION VIEW -->
+        <div id="thankyou-view" class="view" style="justify-content:center;">
+            <div class="thankyou-card">
+                <div class="thankyou-icon">🤝🎉</div>
+                <h2 style="color:var(--primary-dark); font-size:1.3rem; margin-bottom:6px;">Delivery Complete!</h2>
+                <p style="font-size:0.88rem; font-weight:700; color:var(--text-main); margin-bottom:10px;">
+                    Thank you for doing business with us, <span id="thank-user-name">valued customer</span>!
+                </p>
+                <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.4; margin-bottom:16px;">
+                    We are honored to handle your cargo. Your order has been safely fulfilled. We look forward to serving you again!
+                </p>
+
+                <button class="btn btn-accent" id="thank-review-btn">Rate Your Experience ⭐</button>
+                <button class="btn btn-outline" style="margin-top:8px;" id="thank-home-btn">Return to Home</button>
+            </div>
+        </div>
+
+        <!-- 11. REFUND VIEW -->
+        <div id="refund-view" class="view">
+            <h2>Ask for Refund</h2>
+            <p class="subtitle">Tell us if something is wrong with your item</p>
+
+            <div class="form-group">
+                <label>Select Item</label>
+                <select><option>Order #AG001 - TWS Earbuds ($12.50)</option></select>
+            </div>
+
+            <div class="form-group">
+                <label>What is wrong?</label>
+                <select>
+                    <option>Product is not what I asked for</option>
+                    <option>Product broke during transport</option>
+                    <option>Product is not turning on</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Explain more</label>
+                <textarea rows="3" placeholder="Tell us more about the problem..."></textarea>
+            </div>
+
+            <button class="btn btn-accent" id="refund-submit-btn">Send Refund Request</button>
+        </div>
+
+        <!-- 12. RATING VIEW -->
+        <div id="review-view" class="view">
+            <h2>Rate Product</h2>
+            <p class="subtitle">Did you like your item?</p>
+
+            <div class="form-group">
+                <label>Give Stars</label>
+                <div class="rating-stars" id="star-rating">
+                    <span class="star" data-star="1">★</span>
+                    <span class="star" data-star="2">★</span>
+                    <span class="star" data-star="3">★</span>
+                    <span class="star" data-star="4">★</span>
+                    <span class="star" data-star="5">★</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Write a Comment</label>
+                <textarea rows="3" placeholder="Tell other buyers if this product is good..."></textarea>
+            </div>
+
+            <button class="btn btn-accent" id="review-submit-btn">Send Rating</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let cart = [];
+        let navHistory = ['login-view'];
+        let currentSelectedProduct = {};
+        let activePaymentTab = 'mobile';
+        let currentAdIndex = 0;
+        let toastTimeout;
+        let selectedCurrency = 'USD';
+
+        const currencyRates = {
+            USD: { symbol: '$', rate: 1 },
+            TZS: { symbol: 'TSh ', rate: 2600 },
+            KES: { symbol: 'KSh ', rate: 130 },
+            UGX: { symbol: 'UGX ', rate: 3700 },
+            CNY: { symbol: '¥', rate: 7.2 }
+        };
+
+        setInterval(() => {
+            const slides = document.querySelectorAll('.ad-slide');
+            if (slides.length > 0) {
+                slides[currentAdIndex].classList.remove('active');
+                currentAdIndex = (currentAdIndex + 1) % slides.length;
+                slides[currentAdIndex].classList.add('active');
+            }
+        }, 3500);
+
+        function triggerToast(msg) {
+            const toast = document.getElementById('toast-popup');
+            document.getElementById('toast-message').innerText = msg;
+            clearTimeout(toastTimeout);
+            toast.classList.add('show');
+            toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        }
+
+        function syncHeaderControls(viewId) {
+            const publicViews = ['login-view', 'register-view', 'otp-view'];
+            const isPublic = publicViews.includes(viewId);
+            document.getElementById('back-btn').style.display = isPublic ? 'none' : 'inline-block';
+            document.getElementById('home-btn').style.display = isPublic ? 'none' : 'inline-block';
+            document.getElementById('cart-btn').style.display = isPublic ? 'none' : 'inline-block';
+            document.getElementById('logout-btn').style.display = isPublic ? 'none' : 'inline-block';
+        }
+
+        function navTo(viewId, addHistory = true) {
+            const target = document.getElementById(viewId);
+            if (!target) return;
+
+            const current = document.querySelector('.view.active')?.id;
+            if (addHistory && current && current !== viewId) {
+                navHistory.push(viewId);
+            }
+
+            if (viewId === 'payment-view') {
+                updatePaymentViewTotal();
+            }
+
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            target.classList.add('active');
+            document.getElementById('main-scroll-box').scrollTop = 0;
+            syncHeaderControls(viewId);
+        }
+
+        function goBack() {
+            if (navHistory.length <= 1) {
+                navTo('dash-view', false);
+                return;
+            }
+            navHistory.pop();
+            navTo(navHistory[navHistory.length - 1], false);
+        }
+
+        function logout() {
+            triggerToast('Logged out! Resetting profile.');
+            cart = [];
+            updateCartBadge();
+            navHistory = ['login-view'];
+            navTo('login-view', false);
+        }
+
+        function formatPrice(usdAmount) {
+            const currency = currencyRates[selectedCurrency];
+            const converted = usdAmount * currency.rate;
+            return `${currency.symbol}${converted.toLocaleString(undefined, { minimumFractionDigits: currency.rate === 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+        }
+
+        function updateCatalogPrices() {
+            document.querySelectorAll('.product-price').forEach(el => {
+                const usd = parseFloat(el.getAttribute('data-usd'));
+                el.innerText = `${formatPrice(usd)} / unit`;
+            });
+        }
+
+        function updatePaymentViewTotal() {
+            let totalUsd = cart.reduce((sum, item) => sum + item.priceUsd, 0);
+            if (totalUsd === 0) totalUsd = 12.50;
+            document.getElementById('checkout-total-display').innerText = formatPrice(totalUsd);
+
+            const countryCode = document.getElementById('catalog-country')?.value;
+            const countryNames = { TZ: 'Tanzania', KE: 'Kenya', UG: 'Uganda', CN: 'China', US: 'United States' };
+            document.getElementById('pay-country-label').innerText = countryCode ? `Destination: ${countryNames[countryCode]}` : 'Standard Shipping Rate';
+        }
+
+        function updateCountryCurrency() {
+            const country = document.getElementById('reg-country').value;
+            const phoneCodeSelect = document.getElementById('phone-code');
+
+            if (country === 'TZ') phoneCodeSelect.value = '+255 (TZ)';
+            else if (country === 'KE') phoneCodeSelect.value = '+254 (KE)';
+            else if (country === 'UG') phoneCodeSelect.value = '+256 (UG)';
+            else if (country === 'CN') phoneCodeSelect.value = '+86 (CN)';
+            else if (country === 'US') phoneCodeSelect.value = '+1 (US)';
+        }
+
+        function peekPassword(inputId, btnEl) {
+            const input = document.getElementById(inputId);
+            input.type = 'text';
+            btnEl.innerText = '🙈';
+            setTimeout(() => {
+                input.type = 'password';
+                btnEl.innerText = '👁️';
+            }, 800);
+        }
+
+        function openCart() {
+            renderCartItems();
+            document.getElementById('cart-modal').classList.add('active');
+        }
+
+        function closeCart() {
+            document.getElementById('cart-modal').classList.remove('active');
+        }
+
+        function updateCartBadge() {
+            document.getElementById('cart-badge').innerText = cart.length;
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items-list');
+            const totalEl = document.getElementById('cart-total-val');
+            if (cart.length === 0) {
+                container.innerHTML = `<p style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:16px 0;">Your cart is empty.</p>`;
+                totalEl.innerText = formatPrice(0);
+                return;
+            }
+
+            let html = '';
+            let totalUsd = 0;
+            cart.forEach((item, index) => {
+                totalUsd += item.priceUsd;
+                html += `
+                    <div class="cart-item">
+                        <div>
+                            <div class="cart-item-info">${item.title}</div>
+                            <div class="cart-item-price">${formatPrice(item.priceUsd)}</div>
+                        </div>
+                        <button data-remove-idx="${index}" class="cart-remove-item-btn" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.75rem;">Remove</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            totalEl.innerText = formatPrice(totalUsd);
+
+            document.querySelectorAll('.cart-remove-item-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(e.target.getAttribute('data-remove-idx'));
+                    cart.splice(idx, 1);
+                    updateCartBadge();
+                    renderCartItems();
+                });
+            });
+        }
+
+        function requireCountryBeforeBuying() {
+            const country = document.getElementById('catalog-country')?.value;
+            if (!country) {
+                triggerToast('⚠️ Please select your destination country first.');
+                document.getElementById('catalog-country')?.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function addToCart(title, priceUsd) {
+            cart.push({ title: title, priceUsd: parseFloat(priceUsd) });
+            updateCartBadge();
+            triggerToast(`Added ${title} to Cart!`);
+        }
+
+        function buyNowDirect(title, priceUsd) {
+            cart = [{ title: title, priceUsd: parseFloat(priceUsd) }];
+            updateCartBadge();
+            triggerToast(`Proceeding to buy ${title}`);
+            navTo('payment-view');
+        }
+
+        function showProductDetails(name, brand, priceUsd, color, size, features, img) {
+            currentSelectedProduct = { name, brand, priceUsd: parseFloat(priceUsd), color, size, features, img };
+            document.getElementById('pd-title').innerText = name;
+            document.getElementById('pd-brand').innerText = brand;
+            document.getElementById('pd-price').innerText = formatPrice(priceUsd);
+            document.getElementById('pd-color').innerText = color;
+            document.getElementById('pd-size').innerText = size;
+            document.getElementById('pd-features').innerText = features;
+            document.getElementById('pd-img').src = img;
+            navTo('product-detail-view');
+        }
+
+        function switchPaymentTab(tabType) {
+            activePaymentTab = tabType;
+            document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('selected'));
+            document.getElementById('tab-' + tabType).classList.add('selected');
+
+            document.getElementById('form-mobile').style.display = tabType === 'mobile' ? 'block' : 'none';
+            document.getElementById('form-card').style.display = tabType === 'card' ? 'block' : 'none';
+            document.getElementById('form-paypal').style.display = tabType === 'paypal' ? 'block' : 'none';
+            document.getElementById('form-bank').style.display = tabType === 'bank' ? 'block' : 'none';
+        }
+
+        function filterCatalog() {
+            const query = document.getElementById('catalog-search').value.trim().toLowerCase();
+            const words = query.split(/\s+/).filter(Boolean);
+            const cards = document.querySelectorAll('#product-grid .product-card');
+
+            cards.forEach(card => {
+                const searchableText = (
+                    card.getAttribute('data-search') ||
+                    card.getAttribute('data-title') ||
+                    card.innerText
+                ).toLowerCase();
+                const matches = words.every(word => searchableText.includes(word));
+                card.style.display = matches ? 'flex' : 'none';
+            });
+
+            let noResults = document.getElementById('no-search-results');
+            if (!noResults) {
+                noResults = document.createElement('p');
+                noResults.id = 'no-search-results';
+                noResults.style.cssText = 'display:none; text-align:center; color:var(--text-muted); font-size:.8rem; padding:18px 8px;';
+                document.getElementById('product-grid').appendChild(noResults);
+            }
+
+            const visibleCards = [...cards].some(card => card.style.display !== 'none');
+            if (!visibleCards && query) {
+                noResults.innerText = `No available product matches "${query}".`;
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+
+        function updateCatalogPaymentOptions() {
+            const country = document.getElementById('catalog-country').value;
+            const result = document.getElementById('catalog-payment-result');
+
+            if (!country) {
+                result.className = 'catalog-payment-result';
+                result.innerHTML = '<span>💳</span><span>Select your country to view available payment methods.</span>';
+                selectedCurrency = 'USD';
+                updateCatalogPrices();
+                return;
+            }
+
+            const methods = {
+                TZ: ['M-Pesa (Vodacom)', 'Yas / Tigo Pesa', 'Airtel Money', 'CRDB / NMB Bank Transfer'],
+                KE: ['Safaricom M-Pesa', 'Equity Bank', 'Credit / Debit Card'],
+                UG: ['MTN Mobile Money', 'Airtel Money', 'Bank Transfer'],
+                CN: ['Alipay', 'WeChat Pay', 'Bank Transfer'],
+                US: ['Credit / Debit Card', 'PayPal', 'Bank Transfer']
+            };
+
+            const names = { TZ: 'Tanzania', KE: 'Kenya', UG: 'Uganda', CN: 'China', US: 'United States' };
+
+            result.className = 'catalog-payment-result ready';
+            result.innerHTML = `
+                <div>
+                    <div>💳 Payment methods available in ${names[country]}:</div>
+                    <div class="payment-method-pills">
+                        ${methods[country].map(m => `<span class="payment-method-pill">${m}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+
+            const currencyMap = { TZ: 'TZS', KE: 'KES', UG: 'UGX', CN: 'CNY', US: 'USD' };
+            selectedCurrency = currencyMap[country];
+            updateCatalogPrices();
+            renderCartItems();
+        }
+
+        // EVENT BINDINGS
+        document.getElementById('back-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); goBack(); });
+        document.getElementById('home-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); navTo('dash-view'); });
+        document.getElementById('cart-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openCart(); });
+        document.getElementById('logout-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); logout(); });
+        document.getElementById('cart-close-btn').addEventListener('click', closeCart);
+
+        document.getElementById('reg-country').addEventListener('change', updateCountryCurrency);
+        document.getElementById('reg-pass-peek').addEventListener('click', function() { peekPassword('reg-pass', this); });
+        document.getElementById('terms-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Terms: AgizaSafe buys and brings products safely to you.');
+        });
+
+        document.getElementById('reg-submit-btn').addEventListener('click', () => {
+            const name = document.getElementById('reg-name').value;
+            const terms = document.getElementById('terms-check').checked;
+            if (!terms) {
+                triggerToast('⚠️ Please click box to agree to rules');
+                return;
+            }
+            triggerToast('Profile created successfully!');
+            if(name) {
+                document.getElementById('user-display').innerText = name.split(' ')[0];
+                document.getElementById('thank-user-name').innerText = name;
+            }
+            navTo('login-view');
+        });
+
+        document.getElementById('reg-login-btn').addEventListener('click', () => navTo('login-view'));
+
+        document.getElementById('login-pass-peek').addEventListener('click', function() { peekPassword('login-pass', this); });
+        document.getElementById('login-submit-btn').addEventListener('click', () => {
+            const pass = document.getElementById('login-pass').value;
+            const err = document.getElementById('login-error');
+            if (pass !== 'password123') {
+                err.style.display = 'block';
+                triggerToast('⚠️ Wrong password!');
+            } else {
+                err.style.display = 'none';
+                triggerToast('Security code sent to phone!');
+                navTo('otp-view');
+            }
+        });
+
+        document.getElementById('login-reg-btn').addEventListener('click', () => navTo('register-view'));
+        document.getElementById('otp-verify-btn').addEventListener('click', () => {
+            triggerToast('Security code verified! Welcome');
+            navTo('dash-view');
+        });
+
+        document.getElementById('dash-nav-catalog').addEventListener('click', () => navTo('catalog-view'));
+        document.getElementById('dash-nav-track').addEventListener('click', () => navTo('track-view'));
+        document.getElementById('dash-nav-refund').addEventListener('click', () => navTo('refund-view'));
+        document.getElementById('dash-nav-review').addEventListener('click', () => navTo('review-view'));
+
+        document.getElementById('catalog-country').addEventListener('change', updateCatalogPaymentOptions);
+        document.getElementById('catalog-search').addEventListener('keyup', filterCatalog);
+
+        document.getElementById('prod-card-earbuds').addEventListener('click', () => {
+            showProductDetails('TWS Earbuds Pro', 'Lenovo', 12.50, 'Black, White, Blue', 'Compact', 'Noise cancellation, 20h battery', 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300');
+        });
+        document.getElementById('btn-add-earbuds').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(requireCountryBeforeBuying()) addToCart('TWS Earbuds Pro', 12.50);
+        });
+        document.getElementById('btn-buy-earbuds').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(requireCountryBeforeBuying()) buyNowDirect('TWS Earbuds Pro', 12.50);
+        });
+
+        document.getElementById('prod-card-watch').addEventListener('click', () => {
+            showProductDetails('Smartwatch Series 8', 'Kospet', 24.00, 'Black, Silver', '44mm Screen', 'Heart rate tracker, IP68 Waterproof', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300');
+        });
+        document.getElementById('btn-add-watch').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(requireCountryBeforeBuying()) addToCart('Smartwatch Series 8', 24.00);
+        });
+        document.getElementById('btn-buy-watch').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(requireCountryBeforeBuying()) buyNowDirect('Smartwatch Series 8', 24.00);
+        });
+
+        document.getElementById('pd-add-btn').addEventListener('click', () => {
+            if (!requireCountryBeforeBuying()) { navTo('catalog-view'); return; }
+            const qty = parseInt(document.getElementById('pd-qty').value) || 1;
+            for (let i = 0; i < qty; i++) {
+                cart.push({ title: currentSelectedProduct.name, priceUsd: currentSelectedProduct.priceUsd });
+            }
+            updateCartBadge();
+            triggerToast(`Added ${qty} unit(s) of ${currentSelectedProduct.name} to Cart!`);
+            navTo('catalog-view');
+        });
+
+        document.getElementById('pd-buy-btn').addEventListener('click', () => {
+            if (!requireCountryBeforeBuying()) { navTo('catalog-view'); return; }
+            const qty = parseInt(document.getElementById('pd-qty').value) || 1;
+            cart = [];
+            for (let i = 0; i < qty; i++) {
+                cart.push({ title: currentSelectedProduct.name, priceUsd: currentSelectedProduct.priceUsd });
+            }
+            updateCartBadge();
+            triggerToast(`Proceeding to checkout for ${currentSelectedProduct.name}`);
+            navTo('payment-view');
+        });
+
+        document.getElementById('tab-mobile').addEventListener('click', () => switchPaymentTab('mobile'));
+        document.getElementById('tab-card').addEventListener('click', () => switchPaymentTab('card'));
+        document.getElementById('tab-paypal').addEventListener('click', () => switchPaymentTab('paypal'));
+        document.getElementById('tab-bank').addEventListener('click', () => switchPaymentTab('bank'));
+
+        document.getElementById('cart-checkout-btn').addEventListener('click', () => {
+            closeCart();
+            navTo('payment-view');
+        });
+
+        document.getElementById('pay-submit-btn').addEventListener('click', () => {
+            let totalUsd = cart.reduce((sum, item) => sum + item.priceUsd, 0);
+            if (totalUsd === 0) totalUsd = 12.50;
+
+            const formattedTotal = formatPrice(totalUsd);
+            const randomReceiptId = '#AG-' + Math.floor(10000 + Math.random() * 90000);
+            const name = document.getElementById('reg-name').value || 'Valued Customer';
+
+            document.getElementById('rec-id').innerText = randomReceiptId;
+            document.getElementById('rec-payer').innerText = name;
+            document.getElementById('rec-channel').innerText = activePaymentTab.toUpperCase();
+            document.getElementById('rec-date').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('rec-amount').innerText = formattedTotal;
+
+            triggerToast(`Payment of ${formattedTotal} received!`);
+            cart = [];
+            updateCartBadge();
+            navTo('confirmation-view');
+        });
+
+        document.getElementById('rec-track-btn').addEventListener('click', () => navTo('track-view'));
+        document.getElementById('rec-dash-btn').addEventListener('click', () => navTo('dash-view'));
+
+        document.getElementById('track-confirm-btn').addEventListener('click', () => {
+            const step = document.getElementById('final-delivery-step');
+            step.classList.remove('active');
+            step.classList.add('completed');
+            
+            const name = document.getElementById('reg-name').value || 'Valued Customer';
+            document.getElementById('thank-user-name').innerText = name;
+
+            triggerToast('Delivery Confirmed! Thank you!');
+            navTo('thankyou-view');
+        });
+
+        document.getElementById('thank-review-btn').addEventListener('click', () => navTo('review-view'));
+        document.getElementById('thank-home-btn').addEventListener('click', () => navTo('dash-view'));
+
+        document.getElementById('refund-submit-btn').addEventListener('click', () => {
+            triggerToast('Refund request sent successfully!');
+            navTo('dash-view');
+        });
+
+        document.querySelectorAll('#star-rating .star').forEach(starEl => {
+            starEl.addEventListener('click', (e) => {
+                const rating = parseInt(e.target.getAttribute('data-star'));
+                const stars = document.querySelectorAll('#star-rating .star');
+                stars.forEach((s, idx) => {
+                    if (idx < rating) s.classList.add('selected');
+                    else s.classList.remove('selected');
+                });
+                triggerToast(`Given ${rating} Star(s) rating`);
+            });
+        });
+
+        document.getElementById('review-submit-btn').addEventListener('click', () => {
+            triggerToast('Thank you for your rating!');
+            navTo('dash-view');
+        });
+
+        syncHeaderControls('login-view');
+    });
+</script>
+
+</body>
+</html>
