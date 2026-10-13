@@ -1,5 +1,6 @@
-USE TableCreation_db;
+USE AgizaSafe_db;
 GO
+
 SET IDENTITY_INSERT [User] ON;
 
 INSERT INTO [User](Id, PhoneNumber, Email, Password, FirstName, MiddleName, LastName, CreatedAt, CreatedBy)
@@ -55,6 +56,7 @@ GO
 
 SELECT * FROM tblListSource;
 GO
+
 SET IDENTITY_INSERT Currency ON;
 
 INSERT INTO Currency(Id, Code, Name, Symbol)
@@ -72,24 +74,49 @@ GO
 SELECT * FROM Currency;
 GO
 
+
 SET IDENTITY_INSERT Customer ON;
 
-INSERT INTO Customer(Id, FirstName, MiddleName, LastName, BusinessSectorId, BusinessName, BusinessAddress, CreatedAt, CreatedBy)
-SELECT TB.*, 1
+INSERT INTO Customer(
+    Id, FirstName, MiddleName, LastName,
+    PhoneNumber, Email,
+    BusinessSectorId, BusinessName, BusinessAddress,
+    CreatedAt, CreatedBy
+)
+SELECT TB.*
 FROM (
-    SELECT 1 Id, 'Asha' FirstName, 'Neema' MiddleName, 'Mushi' LastName, 9 BusinessSectorId, 'Asha Boutique' BusinessName, 'Sinza Dar es Salaam' BusinessAddress, '2026-09-05 09:00' CreatedAt
+    SELECT
+        1 AS Id, 'Asha' AS FirstName, 'Neema' AS MiddleName, 'Mushi' AS LastName,
+        '0712345678' AS PhoneNumber, 'asha@gmail.com' AS Email,
+        9 AS BusinessSectorId, 'Asha Boutique' AS BusinessName, 'Sinza Dar es Salaam' AS BusinessAddress,
+        CAST('2026-09-05 09:00' AS DATETIME) AS CreatedAt, 1 AS CreatedBy
+
     UNION ALL
-    SELECT 2, 'Brian', NULL, 'John', 10, 'BJ Cosmetics', 'Ubungo Dar es Salaam', '2026-09-05 10:00'
+
+    SELECT
+        2, 'Brian', NULL, 'John',
+        '0756789012', 'brian@gmail.com',
+        10, 'BJ Cosmetics', 'Ubungo Dar es Salaam',
+        CAST('2026-09-05 10:00' AS DATETIME), 1
+
     UNION ALL
-    SELECT 3, 'David', 'Jackson', 'Massawe', 11, 'Neema Electronics', 'Kinyerezi Dar es Salaam', '2026-09-06 10:00'
-) TB
-WHERE NOT EXISTS (SELECT 1 FROM Customer WHERE Customer.Id = TB.Id);
+
+    SELECT
+        3, 'David', 'Jackson', 'Massawe',
+        '0767890123', 'david@gmail.com',
+        11, 'Neema Electronics', 'Kinyerezi Dar es Salaam',
+        CAST('2026-09-06 10:00' AS DATETIME), 1
+) AS TB
+WHERE NOT EXISTS (
+    SELECT 1 FROM Customer WHERE Customer.Id = TB.Id
+);
 
 SET IDENTITY_INSERT Customer OFF;
 GO
 
 SELECT * FROM Customer;
 GO
+
 SET IDENTITY_INSERT Product ON;
 
 INSERT INTO Product(Id, CategoryId, Name, UnitPrice, CurrencyId, Description, CreatedAt, CreatedBy)
@@ -113,26 +140,61 @@ GO
 
 SET IDENTITY_INSERT [Order] ON;
 
-INSERT INTO [Order](Id, OrderNumber, CustomerId, OrderDate, StatusId, ExchangeRate, Total, CurrencyId, CreatedAt, CreatedBy)
-SELECT TB.*, 1
+INSERT INTO [Order](
+    Id, OrderNumber, CustomerId, OrderDate,
+    StatusId, ExchangeRate, Total, CurrencyId,
+    CreatedAt, CreatedBy
+)
+SELECT TB.*
 FROM (
-    SELECT 1 Id, 10001 OrderNumber, 1 CustomerId, '2026-09-10 10:00' OrderDate, 6 StatusId, 1.000000 ExchangeRate, 70000.00 Total, 1 CurrencyId, '2026-09-10 10:00' CreatedAt
+    SELECT
+        1 AS Id, 'AGZ-00001' AS OrderNumber, 1 AS CustomerId,
+        CAST('2026-09-10 10:00' AS DATETIME) AS OrderDate,
+        6 AS StatusId, 1.000000 AS ExchangeRate, 70000.00 AS Total, 1 AS CurrencyId,
+        CAST('2026-09-10 10:00' AS DATETIME) AS CreatedAt, 1 AS CreatedBy
+
     UNION ALL
-    SELECT 2, 10002, 2, '2026-09-10 11:00', 7, 1.000000, 83000.00, 1, '2026-09-10 11:00'
+
+    SELECT
+        2, 'AGZ-00002', 2,
+        CAST('2026-09-10 11:00' AS DATETIME),
+        7, 1.000000, 83000.00, 1,
+        CAST('2026-09-10 11:00' AS DATETIME), 1
+
     UNION ALL
-    SELECT 3, 10003, 3, '2026-09-11 09:30', 8, 1.000000, 38000.00, 1, '2026-09-11 09:30'
+
+    SELECT
+        3, 'AGZ-00003', 3,
+        CAST('2026-09-11 09:30' AS DATETIME),
+        8, 1.000000, 38000.00, 1,
+        CAST('2026-09-11 09:30' AS DATETIME), 1
+
     UNION ALL
-    SELECT 4, 10004, 2, '2026-09-11 14:00', 5, 1.000000, 98000.00, 1, '2026-09-11 14:00'
+
+    SELECT
+        4, 'AGZ-00004', 2,
+        CAST('2026-09-11 14:00' AS DATETIME),
+        5, 1.000000, 98000.00, 1,
+        CAST('2026-09-11 14:00' AS DATETIME), 1
+
     UNION ALL
-    SELECT 5, 10005, 1, '2026-09-12 16:00', 6, 1.000000, 63000.00, 1, '2026-09-12 16:00'
-) TB
-WHERE NOT EXISTS (SELECT 1 FROM [Order] WHERE [Order].Id = TB.Id);
+
+    SELECT
+        5, 'AGZ-00005', 1,
+        CAST('2026-09-12 16:00' AS DATETIME),
+        6, 1.000000, 63000.00, 1,
+        CAST('2026-09-12 16:00' AS DATETIME), 1
+) AS TB
+WHERE NOT EXISTS (
+    SELECT 1 FROM [Order] WHERE [Order].Id = TB.Id
+);
 
 SET IDENTITY_INSERT [Order] OFF;
 GO
 
 SELECT * FROM [Order];
 GO
+
 
 SET IDENTITY_INSERT OrderDetails ON;
 
@@ -162,3 +224,4 @@ GO
 
 SELECT * FROM OrderDetails;
 GO
+
