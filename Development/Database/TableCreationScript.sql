@@ -54,8 +54,6 @@ CREATE TABLE Customer(
 		FirstName VARCHAR(50) NOT NULL,
 		MiddleName VARCHAR(50) NULL,
 		LastName VARCHAR(50) NOT NULL,
-		PhoneNumber VARCHAR(20) NOT NULL,
-		Email VARCHAR(100) NULL,
 		BusinessSectorId NUMERIC(11,0) NULL,
 		BusinessName VARCHAR(150) NULL,
 		BusinessAddress VARCHAR(255) NULL,

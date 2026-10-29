@@ -79,7 +79,6 @@ SET IDENTITY_INSERT Customer ON;
 
 INSERT INTO Customer(
     Id, FirstName, MiddleName, LastName,
-    PhoneNumber, Email,
     BusinessSectorId, BusinessName, BusinessAddress,
     CreatedAt, CreatedBy
 )
@@ -87,7 +86,6 @@ SELECT TB.*
 FROM (
     SELECT
         1 AS Id, 'Asha' AS FirstName, 'Neema' AS MiddleName, 'Mushi' AS LastName,
-        '0712345678' AS PhoneNumber, 'asha@gmail.com' AS Email,
         9 AS BusinessSectorId, 'Asha Boutique' AS BusinessName, 'Sinza Dar es Salaam' AS BusinessAddress,
         CAST('2026-09-05 09:00' AS DATETIME) AS CreatedAt, 1 AS CreatedBy
 
@@ -95,7 +93,6 @@ FROM (
 
     SELECT
         2, 'Brian', NULL, 'John',
-        '0756789012', 'brian@gmail.com',
         10, 'BJ Cosmetics', 'Ubungo Dar es Salaam',
         CAST('2026-09-05 10:00' AS DATETIME), 1
 
@@ -103,7 +100,6 @@ FROM (
 
     SELECT
         3, 'David', 'Jackson', 'Massawe',
-        '0767890123', 'david@gmail.com',
         11, 'Neema Electronics', 'Kinyerezi Dar es Salaam',
         CAST('2026-09-06 10:00' AS DATETIME), 1
 ) AS TB
